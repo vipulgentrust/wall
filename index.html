@@ -36,6 +36,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: inherit;
         }
 
         .top-left {
@@ -70,17 +71,34 @@
                 transform: translateY(100vh) rotate(360deg);
             }
         }
+
+        button {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            color: #333;
+            font-size: 16px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
     </style>
 </head>
 <body>
     <!-- Fireplace -->
     <div class="video-container" id="video-container">
-        <video autoplay muted loop>
+        <video autoplay loop id="fireplace-video">
             <source src="video.mp4" type="video/mp4">
             <source src="video.webm" type="video/webm">
             <source src="video.ogg" type="video/ogg">
             Your browser does not support the video tag.
         </video>
+        <button id="play-button">Play Fireplace Sound 🔊</button>
     </div>
 
     <!-- Information -->
@@ -94,19 +112,52 @@
     <div class="fact" id="fact">Fetching a holiday fact...</div>
 
     <script>
-        // Curated facts about Christmas
-        const facts = [
-            "Christmas trees were first used by ancient Egyptians and Romans.",
-            "The tradition of hanging stockings comes from a legend about St. Nicholas.",
-            "The first Christmas card was sent in 1843.",
-            "Rudolph the Red-Nosed Reindeer was created as a marketing gimmick.",
-            "Santa’s sleigh travels at the speed of light to deliver gifts.",
-            "Candy canes were originally created to keep children quiet during church services.",
-            "In Japan, eating KFC is a popular Christmas tradition.",
-            "The largest Christmas gift ever given was the Statue of Liberty.",
-            "Santa has different names around the world: Père Noël in France, Ded Moroz in Russia.",
-            "The first artificial Christmas trees were made from goose feathers in Germany."
-        ];
+      const facts = [
+    "Christmas trees were first used by ancient Egyptians and Romans.",
+    "The tradition of hanging stockings comes from a legend about St. Nicholas.",
+    "The first Christmas card was sent in 1843.",
+    "Rudolph the Red-Nosed Reindeer was created as a marketing gimmick.",
+    "Santa’s sleigh travels at the speed of light to deliver gifts.",
+    "Candy canes were originally created to keep children quiet during church services.",
+    "In Japan, eating KFC is a popular Christmas tradition.",
+    "The largest Christmas gift ever given was the Statue of Liberty.",
+    "Santa has different names around the world: Père Noël in France, Ded Moroz in Russia.",
+    "The first artificial Christmas trees were made from goose feathers in Germany.",
+    "Santa Claus didn’t always wear red; he used to wear blue and green too!",
+    "The abbreviation 'Xmas' dates back to the 16th century and is derived from the Greek letter 'Chi.'",
+    "Jingle Bells was originally written for Thanksgiving, not Christmas.",
+    "Christmas wasn't declared a federal holiday in the United States until June 26, 1870.",
+    "The tallest Christmas tree ever displayed was in Seattle in 1950, standing 221 feet tall.",
+    "Silent Night is the most recorded Christmas song in history.",
+    "In the Netherlands, Santa Claus is accompanied by a helper named 'Zwarte Piet.'",
+    "The custom of Advent calendars started in Germany in the 19th century.",
+    "More than 1.76 billion candy canes are produced every year in the U.S.",
+    "In Iceland, children place shoes by the window to receive gifts from the 13 Yule Lads.",
+    "The largest gingerbread house ever made was as big as a real house, covering 2,520 square feet.",
+    "Santa's official address in Canada is 'H0H 0H0, North Pole, Canada.'",
+    "The Christmas tree in Trafalgar Square, London, is an annual gift from Norway.",
+    "Eggnog dates back to medieval Britain and was originally called 'posset.'",
+    "In Poland, it's tradition to share a thin wafer known as 'Oplatek' before Christmas dinner.",
+    "The world's largest snowman was built in Maine in 2008, standing over 122 feet tall.",
+    "In Ukraine, finding a spider web on a Christmas tree is considered good luck.",
+    "Christmas crackers were invented in 1847 by a London sweet maker named Tom Smith.",
+    "The first Christmas tree farm in the U.S. was established in 1901 in New Jersey.",
+    "Every year, the Rockefeller Center Christmas tree is decorated with over 25,000 lights.",
+    "In Germany, it’s tradition to hide a pickle ornament in the Christmas tree.",
+    "In Finland, families light candles on the graves of loved ones on Christmas Eve.",
+    "The song 'We Wish You a Merry Christmas' was originally a threat to bring figgy pudding.",
+    "Tinsel was invented in Germany in 1610 and was originally made of real silver.",
+    "Christmas pudding originated as a soup made with raisins and wine.",
+    "Boxing Day, celebrated on December 26th, was historically a day for giving to the poor.",
+    "In Austria, children anticipate visits from St. Nicholas and his counterpart, Krampus.",
+    "The world’s largest Christmas stocking measured 106 feet and 9 inches long.",
+    "Poinsettias, a popular Christmas decoration, are native to Mexico and symbolize purity.",
+    "Norad has been 'tracking Santa' on Christmas Eve since 1955.",
+    "Each year, 30 to 35 million real Christmas trees are sold in the U.S.",
+    "In Venezuela, some towns close streets on Christmas Eve so people can roller-skate to church.",
+    "The red and green color scheme of Christmas originates from holly plants."
+];
+
 
         let factIndex = 0;
 
@@ -118,38 +169,28 @@
         }
 
         setInterval(showNextFact, 900000); // Show next fact every 15 minutes
-        showNextFact(); // Show the first fact immediately
+        showNextFact();
 
-        // Update time, temperature, and fireplace status
-        function updateDisplay() {
+        function updateTimeAndTemperature() {
             const timeDiv = document.getElementById("time");
             const tempDiv = document.getElementById("temperature");
             const fireplaceStatusDiv = document.getElementById("fireplace-status");
             const videoContainer = document.getElementById("video-container");
+            const playButton = document.getElementById("play-button");
+            const video = document.getElementById("fireplace-video");
 
             const currentTime = new Date();
             const currentHour = currentTime.getHours();
             const currentMinute = currentTime.getMinutes();
-
-            // Time Display
             const timeStr = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             timeDiv.textContent = `Time: ${timeStr}`;
 
-            // Simulated temperature
-            const tempC = 5; // Replace with dynamic fetching
+            const tempC = 5;
             const tempF = (tempC * 9 / 5 + 32).toFixed(1);
-            let remark = "";
-            if (tempC < 0) remark = "(Igloo time!)";
-            else if (tempC < 3) remark = "(Colder than ice!)";
-            else if (tempC < 7) remark = "(Hot cocoa weather)";
-            else if (tempC < 10) remark = "(Sweater weather)";
-            else if (tempC < 20) remark = "(Perfect for a walk)";
-            else remark = "(Quite warm!)";
-            tempDiv.textContent = `Temperature: ${tempC}°C / ${tempF}°F ${remark}`;
+            tempDiv.textContent = `Temperature: ${tempC}°C / ${tempF}°F`;
 
-            // Fireplace Logic
-            const fireplaceStart = 16; // 3:00 PM
-            const fireplaceEnd = 21.5; // 9:30 PM (21.5 hours = 21:30)
+            const fireplaceStart = 15; // 3:00 PM
+            const fireplaceEnd = 21.5; // 9:30 PM
             const currentDecimalTime = currentHour + currentMinute / 60;
 
             if (currentDecimalTime >= fireplaceStart && currentDecimalTime <= fireplaceEnd) {
@@ -157,42 +198,39 @@
                 fireplaceStatusDiv.textContent = "Fireplace Status: Glowing Warmly 🔥";
             } else {
                 videoContainer.style.display = "none";
-                const hoursToStart = fireplaceStart - currentHour - (currentMinute / 60);
-                if (hoursToStart > 0) {
-                    const remainingHours = Math.floor(hoursToStart);
-                    const remainingMinutes = Math.ceil((hoursToStart - remainingHours) * 60);
-                    fireplaceStatusDiv.textContent = `Fireplace Status: Starts in ${remainingHours}h ${remainingMinutes}m 🕒`;
-                } else {
-                    fireplaceStatusDiv.textContent = "Fireplace Status: Closed for today 🌙";
-                }
+                fireplaceStatusDiv.textContent = "Fireplace Status: Closed for today 🌙";
             }
+
+            // Handle sound autoplay
+            video.play().catch(() => {
+                playButton.style.display = "block";
+            });
+
+            playButton.addEventListener("click", () => {
+                video.play();
+                playButton.style.display = "none";
+            });
         }
 
-        setInterval(updateDisplay, 1000); // Update display every second
+        setInterval(updateTimeAndTemperature, 1000);
 
-        // Create colorful snowflakes and dots
+        // Snowfall
         function createSnowfall() {
-            const colors = ["#FFFFFF", "#ADD8E6", "#FFB6C1", "#B0E0E6", "#FFD700"];
             for (let i = 0; i < 20; i++) {
                 const snowflake = document.createElement("div");
                 snowflake.classList.add("snowflake");
                 snowflake.textContent = Math.random() > 0.5 ? "❄" : "•";
                 snowflake.style.left = Math.random() * window.innerWidth + "px";
                 snowflake.style.animationDuration = Math.random() * 3 + 5 + "s";
-                snowflake.style.color =
-                    snowflake.textContent === "❄" ? "#FFFFFF" : colors[Math.floor(Math.random() * colors.length)];
+                snowflake.style.color = snowflake.textContent === "❄" ? "#FFFFFF" : "#FFD700";
                 snowflake.style.fontSize = `${Math.random() * 10 + 14}px`;
                 document.body.appendChild(snowflake);
-
-                // Remove snowflake after falling
-                setTimeout(() => {
-                    snowflake.remove();
-                }, 10000);
+                setTimeout(() => snowflake.remove(), 10000);
             }
         }
 
-        setInterval(createSnowfall, 60000); // Create snowflakes every 1 minute
-        createSnowfall(); // Initial snowfall
+        setInterval(createSnowfall, 60000);
+        createSnowfall();
     </script>
 </body>
 </html>
