@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas Fireplace</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            background: url('bg.jpg') no-repeat center center;
+            background-size: cover;
+            overflow: hidden;
+        }
+
+        .video-container {
+            width: 60%;
+            height: 20%;
+            position: absolute;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 50px;
+            overflow: hidden;
+            background: black;
+            display: none;
+            box-shadow: 0 0 20px 10px rgba(255, 140, 0, 0.7),
+                        inset 0 0 30px 10px rgba(255, 70, 0, 0.5);
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .top-left {
+            position: absolute;
+            top: 5%;
+            left: 5%;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .fact {
+            position: absolute;
+            top: 15%;
+            left: 5%;
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .snowflake {
+            position: fixed;
+            top: -50px;
+            font-size: 24px;
+            animation: fall 10s linear infinite;
+            opacity: 0.9;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-50px) rotate(0deg);
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fireplace -->
+    <div class="video-container" id="video-container">
+        <video autoplay muted loop>
+            <source src="video.mp4" type="video/mp4">
+            <source src="video.webm" type="video/webm">
+            <source src="video.ogg" type="video/ogg">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <!-- Information -->
+    <div class="top-left">
+        <div id="time">Time: --:--</div>
+        <div id="temperature">Temperature: Loading...</div>
+        <div id="fireplace-status">Fireplace Status: Calculating...</div>
+    </div>
+
+    <!-- Fact Display -->
+    <div class="fact" id="fact">Fetching a holiday fact...</div>
+
+    <script>
+        // Curated facts about Christmas
+        const facts = [
+            "Christmas trees were first used by ancient Egyptians and Romans.",
+            "The tradition of hanging stockings comes from a legend about St. Nicholas.",
+            "The first Christmas card was sent in 1843.",
+            "Rudolph the Red-Nosed Reindeer was created as a marketing gimmick.",
+            "Santa’s sleigh travels at the speed of light to deliver gifts.",
+            "Candy canes were originally created to keep children quiet during church services.",
+            "In Japan, eating KFC is a popular Christmas tradition.",
+            "The largest Christmas gift ever given was the Statue of Liberty.",
+            "Santa has different names around the world: Père Noël in France, Ded Moroz in Russia.",
+            "The first artificial Christmas trees were made from goose feathers in Germany."
+        ];
+
+        let factIndex = 0;
+
+        // Function to display facts
+        function showNextFact() {
+            const factDiv = document.getElementById("fact");
+            factDiv.textContent = facts[factIndex];
+            factIndex = (factIndex + 1) % facts.length;
+        }
+
+        setInterval(showNextFact, 900000); // Show next fact every 15 minutes
+        showNextFact(); // Show the first fact immediately
+
+        // Update time, temperature, and fireplace status
+        function updateDisplay() {
+            const timeDiv = document.getElementById("time");
+            const tempDiv = document.getElementById("temperature");
+            const fireplaceStatusDiv = document.getElementById("fireplace-status");
+            const videoContainer = document.getElementById("video-container");
+
+            const currentTime = new Date();
+            const currentHour = currentTime.getHours();
+            const currentMinute = currentTime.getMinutes();
+
+            // Time Display
+            const timeStr = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            timeDiv.textContent = `Time: ${timeStr}`;
+
+            // Simulated temperature
+            const tempC = 5; // Replace with dynamic fetching
+            const tempF = (tempC * 9 / 5 + 32).toFixed(1);
+            let remark = "";
+            if (tempC < 0) remark = "(Igloo time!)";
+            else if (tempC < 3) remark = "(Colder than ice!)";
+            else if (tempC < 7) remark = "(Hot cocoa weather)";
+            else if (tempC < 10) remark = "(Sweater weather)";
+            else if (tempC < 20) remark = "(Perfect for a walk)";
+            else remark = "(Quite warm!)";
+            tempDiv.textContent = `Temperature: ${tempC}°C / ${tempF}°F ${remark}`;
+
+            // Fireplace Logic
+            const fireplaceStart = 16; // 3:00 PM
+            const fireplaceEnd = 21.5; // 9:30 PM (21.5 hours = 21:30)
+            const currentDecimalTime = currentHour + currentMinute / 60;
+
+            if (currentDecimalTime >= fireplaceStart && currentDecimalTime <= fireplaceEnd) {
+                videoContainer.style.display = "block";
+                fireplaceStatusDiv.textContent = "Fireplace Status: Glowing Warmly 🔥";
+            } else {
+                videoContainer.style.display = "none";
+                const hoursToStart = fireplaceStart - currentHour - (currentMinute / 60);
+                if (hoursToStart > 0) {
+                    const remainingHours = Math.floor(hoursToStart);
+                    const remainingMinutes = Math.ceil((hoursToStart - remainingHours) * 60);
+                    fireplaceStatusDiv.textContent = `Fireplace Status: Starts in ${remainingHours}h ${remainingMinutes}m 🕒`;
+                } else {
+                    fireplaceStatusDiv.textContent = "Fireplace Status: Closed for today 🌙";
+                }
+            }
+        }
+
+        setInterval(updateDisplay, 1000); // Update display every second
+
+        // Create colorful snowflakes and dots
+        function createSnowfall() {
+            const colors = ["#FFFFFF", "#ADD8E6", "#FFB6C1", "#B0E0E6", "#FFD700"];
+            for (let i = 0; i < 20; i++) {
+                const snowflake = document.createElement("div");
+                snowflake.classList.add("snowflake");
+                snowflake.textContent = Math.random() > 0.5 ? "❄" : "•";
+                snowflake.style.left = Math.random() * window.innerWidth + "px";
+                snowflake.style.animationDuration = Math.random() * 3 + 5 + "s";
+                snowflake.style.color =
+                    snowflake.textContent === "❄" ? "#FFFFFF" : colors[Math.floor(Math.random() * colors.length)];
+                snowflake.style.fontSize = `${Math.random() * 10 + 14}px`;
+                document.body.appendChild(snowflake);
+
+                // Remove snowflake after falling
+                setTimeout(() => {
+                    snowflake.remove();
+                }, 10000);
+            }
+        }
+
+        setInterval(createSnowfall, 60000); // Create snowflakes every 1 minute
+        createSnowfall(); // Initial snowfall
+    </script>
+</body>
+</html>
