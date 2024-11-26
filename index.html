@@ -178,41 +178,53 @@
             const videoContainer = document.getElementById("video-container");
             const playButton = document.getElementById("play-button");
             const video = document.getElementById("fireplace-video");
-
+        
             const currentTime = new Date();
             const currentHour = currentTime.getHours();
             const currentMinute = currentTime.getMinutes();
             const timeStr = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             timeDiv.textContent = `Time: ${timeStr}`;
-
-            const tempC = 5;
+        
+            // Simulated temperature (can replace with live API data)
+            const tempC = 5; // Example: current temperature in Celsius
             const tempF = (tempC * 9 / 5 + 32).toFixed(1);
             tempDiv.textContent = `Temperature: ${tempC}°C / ${tempF}°F`;
-
+        
             const fireplaceStart = 15; // 3:00 PM
-            const fireplaceEnd = 21.5; // 9:30 PM
+            const fireplaceEnd = 9.5; // 9:30 AM (next day)
             const currentDecimalTime = currentHour + currentMinute / 60;
-
-            if (currentDecimalTime >= fireplaceStart && currentDecimalTime <= fireplaceEnd) {
+        
+            // Logic to control fireplace
+            if (
+                tempC < 6 || // Turn on if temperature is low
+                (currentDecimalTime >= fireplaceStart || currentDecimalTime <= fireplaceEnd) // Always on during 3 PM to 9:30 AM
+            ) {
                 videoContainer.style.display = "block";
-                fireplaceStatusDiv.textContent = "Fireplace Status: Glowing Warmly 🔥";
+        
+                // Status captions based on conditions
+                if (currentDecimalTime >= fireplaceStart || currentDecimalTime <= fireplaceEnd) {
+                    fireplaceStatusDiv.textContent = "Fireplace Status: Cozy evening vibes 🔥";
+                } else if (tempC < 6) {
+                    fireplaceStatusDiv.textContent = "Fireplace Status: Warming up the cold day ❄️🔥";
+                }
             } else {
                 videoContainer.style.display = "none";
-                fireplaceStatusDiv.textContent = "Fireplace Status: Closed for today 🌙";
+                fireplaceStatusDiv.textContent = "Fireplace Status: Fireplace is resting 💤";
             }
-
+        
             // Handle sound autoplay
             video.play().catch(() => {
                 playButton.style.display = "block";
             });
-
+        
             playButton.addEventListener("click", () => {
                 video.play();
                 playButton.style.display = "none";
             });
         }
-
+        
         setInterval(updateTimeAndTemperature, 1000);
+
 
         // Snowfall
         function createSnowfall() {
