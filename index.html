@@ -171,12 +171,10 @@
         setInterval(showNextFact, 900000); // Show next fact every 15 minutes
         showNextFact();
 
-    async function fetchTemperature() {
+       async function fetchTemperature() {
         try {
-            // Replace with your desired latitude and longitude
-            const latitude = 40.7128; // Example: New York City
+            const latitude = 40.7128; 
             const longitude = -74.0060;
-
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`;
 
             const response = await fetch(url);
@@ -185,11 +183,10 @@
             const data = await response.json();
             const tempC = data.current_weather.temperature; // Temperature in Celsius
             const tempF = (tempC * 9 / 5 + 32).toFixed(1); // Convert to Fahrenheit
-
             return { tempC, tempF };
         } catch (error) {
             console.error("Error fetching temperature:", error);
-            return { tempC: null, tempF: null }; // Return null values in case of an error
+            return { tempC: null, tempF: null }; // Return null if fetch fails
         }
     }
 
@@ -207,9 +204,13 @@
         const timeStr = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         timeDiv.textContent = `Time: ${timeStr}`;
 
+        // Refresh page at :48 minute mark
+        if (currentMinute === 48) {
+            location.reload();
+        }
+
         // Fetch temperature from API
         const { tempC, tempF } = await fetchTemperature();
-
         if (tempC !== null) {
             tempDiv.textContent = `Temperature: ${tempC}°C / ${tempF}°F`;
         } else {
@@ -220,19 +221,32 @@
         const fireplaceEnd = 9.5; // 9:30 AM (next day)
         const currentDecimalTime = currentHour + currentMinute / 60;
 
-        // Logic to control fireplace
+        // Temperature-based statuses
+        const tempStatuses = [
+            { range: [-50, 0], status: "Freezing temperatures! Warming up fast 🥶🔥" },
+            { range: [0, 6], status: "Chilly day! Staying cozy by the fire ❄️🔥" },
+            { range: [6, 15], status: "Cool breeze, but warm vibes here 🌬️🔥" },
+            { range: [15, 25], status: "Mild weather calls for gentle warmth 😊🔥" },
+            { range: [25, 40], status: "Warm day, but the fireplace stays iconic ✨🔥" }
+        ];
+
+        let tempStatus = "Fireplace Status: Fireplace is resting 💤";
+        if (tempC !== null) {
+            for (const status of tempStatuses) {
+                if (tempC >= status.range[0] && tempC < status.range[1]) {
+                    tempStatus = status.status;
+                    break;
+                }
+            }
+        }
+
+        // Final fireplace behavior
         if (
-            (tempC !== null && tempC < 6) || // Turn on if temperature is low
-            (currentDecimalTime >= fireplaceStart || currentDecimalTime <= fireplaceEnd) // Always on during 3 PM to 9:30 AM
+            (tempC !== null && tempC < 6) || // Turn on for low temperature
+            (currentDecimalTime >= fireplaceStart || currentDecimalTime <= fireplaceEnd) // Always on 3 PM to 9:30 AM
         ) {
             videoContainer.style.display = "block";
-
-            // Status captions based on conditions
-            if (currentDecimalTime >= fireplaceStart || currentDecimalTime <= fireplaceEnd) {
-                fireplaceStatusDiv.textContent = "Fireplace Status: Cozy evening vibes 🔥";
-            } else if (tempC < 6) {
-                fireplaceStatusDiv.textContent = "Fireplace Status: Warming up the cold day ❄️🔥";
-            }
+            fireplaceStatusDiv.textContent = tempStatus; // Show temperature-based status
         } else {
             videoContainer.style.display = "none";
             fireplaceStatusDiv.textContent = "Fireplace Status: Fireplace is resting 💤";
@@ -249,10 +263,9 @@
         });
     }
 
-    // Refresh temperature and status every minute
+    // Call every minute and on initial load
     setInterval(updateTimeAndTemperature, 60000);
-    updateTimeAndTemperature(); // Initial call to set everything up
-
+    updateTimeAndTemperature();
 
 
         // Snowfall
