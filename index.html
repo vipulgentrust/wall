@@ -103,7 +103,7 @@
 
     <!-- Information -->
     <div class="top-left">
-        <div id="time">Time: --:--</div>
+        <div id="time">Date: --/--/----, Time: --:--</div>
         <div id="temperature">Temperature: Loading...</div>
         <div id="fireplace-status">Fireplace Status: Calculating...</div>
     </div>
@@ -112,52 +112,13 @@
     <div class="fact" id="fact" style="display:none;">Fetching a holiday fact...</div>
 
     <script>
-      const facts = [
-    "Christmas trees were first used by ancient Egyptians and Romans.",
-    "The tradition of hanging stockings comes from a legend about St. Nicholas.",
-    "The first Christmas card was sent in 1843.",
-    "Rudolph the Red-Nosed Reindeer was created as a marketing gimmick.",
-    "Santa’s sleigh travels at the speed of light to deliver gifts.",
-    "Candy canes were originally created to keep children quiet during church services.",
-    "In Japan, eating KFC is a popular Christmas tradition.",
-    "The largest Christmas gift ever given was the Statue of Liberty.",
-    "Santa has different names around the world: Père Noël in France, Ded Moroz in Russia.",
-    "The first artificial Christmas trees were made from goose feathers in Germany.",
-    "Santa Claus didn’t always wear red; he used to wear blue and green too!",
-    "The abbreviation 'Xmas' dates back to the 16th century and is derived from the Greek letter 'Chi.'",
-    "Jingle Bells was originally written for Thanksgiving, not Christmas.",
-    "Christmas wasn't declared a federal holiday in the United States until June 26, 1870.",
-    "The tallest Christmas tree ever displayed was in Seattle in 1950, standing 221 feet tall.",
-    "Silent Night is the most recorded Christmas song in history.",
-    "In the Netherlands, Santa Claus is accompanied by a helper named 'Zwarte Piet.'",
-    "The custom of Advent calendars started in Germany in the 19th century.",
-    "More than 1.76 billion candy canes are produced every year in the U.S.",
-    "In Iceland, children place shoes by the window to receive gifts from the 13 Yule Lads.",
-    "The largest gingerbread house ever made was as big as a real house, covering 2,520 square feet.",
-    "Santa's official address in Canada is 'H0H 0H0, North Pole, Canada.'",
-    "The Christmas tree in Trafalgar Square, London, is an annual gift from Norway.",
-    "Eggnog dates back to medieval Britain and was originally called 'posset.'",
-    "In Poland, it's tradition to share a thin wafer known as 'Oplatek' before Christmas dinner.",
-    "The world's largest snowman was built in Maine in 2008, standing over 122 feet tall.",
-    "In Ukraine, finding a spider web on a Christmas tree is considered good luck.",
-    "Christmas crackers were invented in 1847 by a London sweet maker named Tom Smith.",
-    "The first Christmas tree farm in the U.S. was established in 1901 in New Jersey.",
-    "Every year, the Rockefeller Center Christmas tree is decorated with over 25,000 lights.",
-    "In Germany, it’s tradition to hide a pickle ornament in the Christmas tree.",
-    "In Finland, families light candles on the graves of loved ones on Christmas Eve.",
-    "The song 'We Wish You a Merry Christmas' was originally a threat to bring figgy pudding.",
-    "Tinsel was invented in Germany in 1610 and was originally made of real silver.",
-    "Christmas pudding originated as a soup made with raisins and wine.",
-    "Boxing Day, celebrated on December 26th, was historically a day for giving to the poor.",
-    "In Austria, children anticipate visits from St. Nicholas and his counterpart, Krampus.",
-    "The world’s largest Christmas stocking measured 106 feet and 9 inches long.",
-    "Poinsettias, a popular Christmas decoration, are native to Mexico and symbolize purity.",
-    "Norad has been 'tracking Santa' on Christmas Eve since 1955.",
-    "Each year, 30 to 35 million real Christmas trees are sold in the U.S.",
-    "In Venezuela, some towns close streets on Christmas Eve so people can roller-skate to church.",
-    "The red and green color scheme of Christmas originates from holly plants."
-];
-
+        const facts = [
+            "Christmas trees were first used by ancient Egyptians and Romans.",
+            "The tradition of hanging stockings comes from a legend about St. Nicholas.",
+            "Jingle Bells was originally written for Thanksgiving, not Christmas.",
+            "Santa Claus didn’t always wear red; he used to wear blue and green too!",
+            "Eggnog dates back to medieval Britain and was originally called 'posset.'"
+        ];
 
         let factIndex = 0;
 
@@ -171,120 +132,98 @@
         setInterval(showNextFact, 900000); // Show next fact every 15 minutes
         showNextFact();
 
-       async function fetchTemperature() {
-        try {
-            const latitude = 40.7128; 
-            const longitude = -74.0060;
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`;
+        async function fetchTemperature() {
+            try {
+                const latitude = 40.7128; 
+                const longitude = -74.0060;
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`;
 
-            const response = await fetch(url);
-            if (!response.ok) throw new Error("Failed to fetch weather data.");
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Failed to fetch weather data.");
 
-            const data = await response.json();
-            const tempC = data.current_weather.temperature; // Temperature in Celsius
-            const tempF = (tempC * 9 / 5 + 32).toFixed(1); // Convert to Fahrenheit
-            return { tempC, tempF };
-        } catch (error) {
-            console.error("Error fetching temperature:", error);
-            return { tempC: null, tempF: null }; // Return null if fetch fails
-        }
-    }
-
-    async function updateTimeAndTemperature() {
-        const timeDiv = document.getElementById("time");
-        const tempDiv = document.getElementById("temperature");
-        const fireplaceStatusDiv = document.getElementById("fireplace-status");
-        const videoContainer = document.getElementById("video-container");
-        const playButton = document.getElementById("play-button");
-        const video = document.getElementById("fireplace-video");
-
-        const currentTime = new Date();
-        const currentHour = currentTime.getHours();
-        const currentMinute = currentTime.getMinutes();
-        const timeStr = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        timeDiv.textContent = `Time: ${timeStr}`;
-
-        // Refresh page at :48 minute mark
-        if (currentMinute === 48) {
-            location.reload();
+                const data = await response.json();
+                const tempC = data.current_weather.temperature; // Temperature in Celsius
+                const tempF = (tempC * 9 / 5 + 32).toFixed(1); // Convert to Fahrenheit
+                return { tempC, tempF };
+            } catch (error) {
+                console.error("Error fetching temperature:", error);
+                return { tempC: null, tempF: null }; // Return null if fetch fails
+            }
         }
 
-        // Fetch temperature from API
-        const { tempC, tempF } = await fetchTemperature();
-        if (tempC !== null) {
-            tempDiv.textContent = `Temperature: ${tempC}°C / ${tempF}°F`;
-        } else {
-            tempDiv.textContent = "Temperature: Unable to fetch data";
-        }
+        async function updateTimeAndTemperature() {
+            const timeDiv = document.getElementById("time");
+            const tempDiv = document.getElementById("temperature");
+            const fireplaceStatusDiv = document.getElementById("fireplace-status");
+            const videoContainer = document.getElementById("video-container");
+            const playButton = document.getElementById("play-button");
+            const video = document.getElementById("fireplace-video");
 
-        const fireplaceStart = 15; // 3:00 PM
-        const fireplaceEnd = 9.5; // 9:30 AM (next day)
-        const currentDecimalTime = currentHour + currentMinute / 60;
+            const currentTime = new Date();
+            const dateStr = currentTime.toLocaleDateString(); // Date in 'MM/DD/YYYY' format
+            const timeStr = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            timeDiv.textContent = `Date: ${dateStr}, Time: ${timeStr}`;
 
-        // Temperature-based statuses
-        const tempStatuses = [
-            { range: [-50, 0], status: "Freezing temperatures! Warming up fast 🥶🔥" },
-            { range: [0, 6], status: "Chilly day! Staying cozy by the fire ❄️🔥" },
-            { range: [6, 15], status: "Cool breeze, but warm vibes here 🌬️🔥" },
-            { range: [15, 25], status: "Mild weather calls for gentle warmth 😊🔥" },
-            { range: [25, 40], status: "Warm day, but the fireplace stays iconic ✨🔥" }
-        ];
+            // Refresh page at :12 minute mark
+            if (currentTime.getMinutes() === 28) {
+                location.reload();
+            }
 
-        let tempStatus = "Fireplace Status: Fireplace is resting 💤";
-        if (tempC !== null) {
-            for (const status of tempStatuses) {
-                if (tempC >= status.range[0] && tempC < status.range[1]) {
-                    tempStatus = status.status;
-                    break;
+            // Fetch temperature from API
+            const { tempC, tempF } = await fetchTemperature();
+            if (tempC !== null) {
+                tempDiv.textContent = `Temperature: ${tempC}°C / ${tempF}°F`;
+            } else {
+                tempDiv.textContent = "Temperature: Unable to fetch data";
+            }
+
+            const fireplaceStart = 15; // 3:00 PM
+            const fireplaceEnd = 9.5; // 9:30 AM (next day)
+            const currentDecimalTime = currentTime.getHours() + currentTime.getMinutes() / 60;
+
+            // Temperature-based statuses
+            const tempStatuses = [
+                { range: [-50, 0], status: "Freezing temperatures! Warming up fast 🥶🔥" },
+                { range: [0, 6], status: "Chilly day! Staying cozy by the fire ❄️🔥" },
+                { range: [6, 15], status: "Cool breeze, but warm vibes here 🌬️🔥" },
+                { range: [15, 25], status: "Mild weather calls for gentle warmth 😊🔥" },
+                { range: [25, 40], status: "Warm day, but the fireplace stays iconic ✨🔥" }
+            ];
+
+            let tempStatus = "Fireplace Status: Fireplace is resting 💤";
+            if (tempC !== null) {
+                for (const status of tempStatuses) {
+                    if (tempC >= status.range[0] && tempC < status.range[1]) {
+                        tempStatus = status.status;
+                        break;
+                    }
                 }
             }
-        }
 
-        // Final fireplace behavior
-        if (
-            (tempC !== null && tempC < 20) || // Turn on for low temperature
-            (currentDecimalTime >= fireplaceStart || currentDecimalTime <= fireplaceEnd) // Always on 3 PM to 9:30 AM
-        ) {
-            videoContainer.style.display = "block";
-            fireplaceStatusDiv.textContent = tempStatus; // Show temperature-based status
-        } else {
-            videoContainer.style.display = "none";
-            fireplaceStatusDiv.textContent = "Fireplace Status: Fireplace is resting 💤";
-        }
-
-        // Handle sound autoplay
-        video.play().catch(() => {
-            playButton.style.display = "block";
-        });
-
-        playButton.addEventListener("click", () => {
-            video.play();
-            playButton.style.display = "none";
-        });
-    }
-
-    // Call every minute and on initial load
-    setInterval(updateTimeAndTemperature, 60000);
-    updateTimeAndTemperature();
-
-
-        // Snowfall
-        function createSnowfall() {
-            for (let i = 0; i < 20; i++) {
-                const snowflake = document.createElement("div");
-                snowflake.classList.add("snowflake");
-                snowflake.textContent = Math.random() > 0.5 ? "❄" : "•";
-                snowflake.style.left = Math.random() * window.innerWidth + "px";
-                snowflake.style.animationDuration = Math.random() * 3 + 5 + "s";
-                snowflake.style.color = snowflake.textContent === "❄" ? "#FFFFFF" : "#FFD700";
-                snowflake.style.fontSize = `${Math.random() * 10 + 14}px`;
-                document.body.appendChild(snowflake);
-                setTimeout(() => snowflake.remove(), 10000);
+            if (
+                (tempC !== null && tempC < 20) || 
+                (currentDecimalTime >= fireplaceStart || currentDecimalTime <= fireplaceEnd)
+            ) {
+                videoContainer.style.display = "block";
+                fireplaceStatusDiv.textContent = tempStatus;
+            } else {
+                videoContainer.style.display = "none";
+                fireplaceStatusDiv.textContent = "Fireplace Status: Fireplace is resting 💤";
             }
+
+            video.play().catch(() => {
+                playButton.style.display = "block";
+            });
+
+            playButton.addEventListener("click", () => {
+                video.play();
+                playButton.style.display = "none";
+            });
         }
 
-        setInterval(createSnowfall, 60000);
-        createSnowfall();
+        // Call every minute and on initial load
+        setInterval(updateTimeAndTemperature, 60000);
+        updateTimeAndTemperature();
     </script>
 </body>
 </html>
