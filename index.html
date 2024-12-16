@@ -242,7 +242,7 @@
 
         // Final fireplace behavior
         if (
-            (tempC !== null && tempC < 6) || // Turn on for low temperature
+            (tempC !== null && tempC < 20) || // Turn on for low temperature
             (currentDecimalTime >= fireplaceStart || currentDecimalTime <= fireplaceEnd) // Always on 3 PM to 9:30 AM
         ) {
             videoContainer.style.display = "block";
