@@ -324,7 +324,7 @@
                         let statusHTML = "";
                         if (now >= startTime && now <= endTime) {
                             const remainingMinutes = Math.ceil((endTime - now) / (1000 * 60));
-                            statusHTML = `<span style="color:green;">Live <img src="live.gif" width="14"></span> (${remainingMinutes} min left)`;
+                            statusHTML = `<span style="color:green;"><img src="live.gif" width="20"></span> Live  (${remainingMinutes} min left)`;
                         }
 
                         if (now < endTime) { // Only show future or ongoing events
