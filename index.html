@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring in GenTrust</title>
+    <style>
+        /* Background container */
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: opacity 1.5s ease-in-out;
+            z-index: -1;
+        }
+    </style>
+    
+    <style>
+        .butterfly {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            pointer-events: none;
+            opacity: 0.9;
+        }
+    
+        @keyframes flutter {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(var(--x1), var(--y1)) rotate(30deg);
+            }
+            50% {
+                transform: translate(var(--x2), var(--y2)) rotate(0deg);
+            }
+            75% {
+                transform: translate(var(--x3), var(--y3)) rotate(-30deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+        }
+    </style>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            background: url('bg.JPG') no-repeat center center;
+            background-size: cover;
+            overflow: hidden;
+        }
+
+      
+
+        .top-left {
+            position: absolute;
+            top: 5%;
+            left: 5%;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .fact {
+            position: absolute;
+            top: 15%;
+            left: 5%;
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .snowflake {
+            position: fixed;
+            top: -50px;
+            font-size: 24px;
+            animation: fall 10s linear infinite;
+            opacity: 0.9;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-50px) rotate(0deg);
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        button {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            color: #333;
+            font-size: 16px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Fireplace -->
+    
+
+    <style>
+        /* Panel Styling */
+        .info-panel {
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.6); /* White with transparency */
+            backdrop-filter: blur(10px); /* Frosted Glass Effect */
+            padding: 15px 30px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 400px;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+    
+        /* Time Styling */
+        .time {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+        }
+    
+        /* Date Styling */
+        .date {
+            font-size: 14px;
+            color: #555;
+        }
+    
+        /* Temperature Styling */
+        .temperature {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            text-align: right;
+        }
+    </style>
+    
+    <!-- Info Panel -->
+    <div class="info-panel">
+        <div>
+            <div class="time" id="time">--:--</div>
+            <div class="date" id="date">--/--/----</div>
+        </div>
+        <div class="temperature" id="temperature">Loading...</div>
+    </div>
+    <style>
+        /* Background container */
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: opacity 1.5s ease-in-out;
+            z-index: -1;
+        }
+    </style>
+    
+    <!-- Background Elements -->
+    <div class="background-container" id="background"></div>
+    <style>
+        /* Calendar Panel Styling */
+        .calendar-panel {
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: 200px;
+        }
+    
+        .calendar-panel h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+    
+        .calendar-panel ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 0;
+        }
+    
+        .calendar-panel li {
+            font-size: 14px;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+    
+        .calendar-panel li:last-child {
+            border-bottom: none;
+        }
+    
+        /* Login Button */
+        .login-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #0078D4;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            width: 200px;
+        }
+    </style>
+    
+    <!-- Microsoft Login Button -->
+    <a id="login-btn" class="login-btn" href="#">🔑 Login with Microsoft</a>
+    
+    <!-- Calendar Panel -->
+    <div class="calendar-panel" id="shared-calendar-panel">
+        <h3>NYC Office Calendar Events (Today & Tomorrow)</h3>
+        <ul>
+            <li>Loading events...</li>
+        </ul>
+    </div>
+    
+    <script>
+        const CLIENT_ID = "c0bc9cbc-deb2-4304-87d5-08d2e571b8c0";  
+        const TENANT_ID = "cda7fbad-153f-42e3-b5a6-8f1c00521708";  
+        const REDIRECT_URI = "https://vipulgentrust.github.io/wall/";  
+        const AUTH_URL = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/authorize?` + 
+        `client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+        `&scope=https://graph.microsoft.com/Calendars.Read.Shared%20https://graph.microsoft.com/User.Read`;
+
+    document.getElementById("login-btn").addEventListener("click", () => {
+        window.location.href = AUTH_URL;
+    });
+
+    function getAccessToken() {
+        const hash = window.location.hash.substring(1);
+        const params = new URLSearchParams(hash);
+        return params.get("access_token");
+    }
+
+    async function fetchNYCOfficeCalendar(token) {
+        const calendarEmail = "NYCoffice@gentrustwm.com";  
+
+        try {
+            const calendarResponse = await fetch(`https://graph.microsoft.com/v1.0/users/${calendarEmail}/calendars`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            const calendarData = await calendarResponse.json();
+            if (!calendarData.value || calendarData.value.length === 0) {
+                document.getElementById("shared-calendar-panel").innerHTML = "No shared calendars found.";
+                return;
+            }
+
+            const calendarId = calendarData.value[0].id;
+
+            // Fetch only events happening today and tomorrow
+            const today = new Date();
+            const tomorrow = new Date();
+            tomorrow.setDate(today.getDate() + 1);
+            
+            const startOfDay = today.toISOString().split("T")[0] + "T00:00:00Z"; 
+            const endOfTomorrow = tomorrow.toISOString().split("T")[0] + "T23:59:59Z";
+
+            const eventsResponse = await fetch(`https://graph.microsoft.com/v1.0/users/${calendarEmail}/calendars/${calendarId}/events?$filter=start/dateTime ge '${startOfDay}' and start/dateTime le '${endOfTomorrow}'&$orderby=start/dateTime`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            const eventsData = await eventsResponse.json();
+
+            let sharedEventsHTML = "<h3>NYC Office Calendar (Today & Tomorrow)</h3><ul>";
+            if (!eventsData.value.length) {
+                sharedEventsHTML += "<li>No upcoming events for today or tomorrow.</li>";
+            } else {
+                eventsData.value.forEach(event => {
+                    const startTime = new Date(event.start.dateTime + "Z"); // Ensure UTC conversion
+                    const endTime = new Date(event.end.dateTime + "Z"); 
+
+                    const localStartTime = startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+                    const localEndTime = endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+
+                    
+                    const duration = (endTime - startTime) / (1000 * 60); // Convert duration to minutes
+                    const durationStr = duration >= 60 
+                        ? `${Math.floor(duration / 60)}h ${duration % 60}m` 
+                        : `${duration} min`;
+
+                                    sharedEventsHTML += `<li><strong>${event.subject}</strong><br>
+                🕒 ${localStartTime} - ${localEndTime} (${durationStr})</li>`;
+
+                });
+            }
+            sharedEventsHTML += "</ul>";
+
+            document.getElementById("shared-calendar-panel").innerHTML = sharedEventsHTML;
+        } catch (error) {
+            console.error("❌ Error fetching shared calendar:", error);
+            document.getElementById("shared-calendar-panel").innerHTML = "⚠️ Error loading shared calendar.";
+        }
+    }
+
+    // 🔹 Auto-refresh the calendar every 30 seconds
+    function startAutoRefresh(token) {
+        fetchNYCOfficeCalendar(token);
+        setInterval(() => fetchNYCOfficeCalendar(token), 30000);
+    }
+
+    // Check for access token and start auto-refresh
+    if (window.location.hash.includes("access_token")) {
+        const token = getAccessToken();
+        if (token) {
+            startAutoRefresh(token);
+            document.getElementById("login-btn").style.display = "none"; // Hide login button
+        }
+    }
+</script>
+    
+    <script>
+        const backgrounds = ['p1.png', 'p2.png', 'p3.png', 'p4.png', 'p5.png', 'p6.png', 'p7.png', 'p8.png', 'p9.png'];
+        let bgIndex = 0;
+        const backgroundDiv = document.getElementById("background");
+    
+        function changeBackground() {
+            backgroundDiv.style.opacity = "0"; // Fade out
+    
+            setTimeout(() => {
+                backgroundDiv.style.backgroundImage = `url('${backgrounds[bgIndex]}')`; // Change image
+                backgroundDiv.style.opacity = "1"; // Fade in
+                bgIndex = (bgIndex + 1) % backgrounds.length;
+            }, 1500); // Wait for fade-out to complete before switching
+        }
+    
+        // Change background every 2 minutes (120,000 ms)
+        setInterval(changeBackground, 120000);
+        changeBackground(); // Initial change
+    </script>
+    <script>
+        async function fetchTemperature() {
+            try {
+                const latitude = 40.7128; 
+                const longitude = -74.0060;
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`;
+    
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Failed to fetch weather data.");
+    
+                const data = await response.json();
+                const tempC = data.current_weather.temperature; // Temperature in Celsius
+                const tempF = (tempC * 9 / 5 + 32).toFixed(1); // Convert to Fahrenheit
+                return { tempC, tempF };
+            } catch (error) {
+                console.error("Error fetching temperature:", error);
+                return { tempC: null, tempF: null }; // Return null if fetch fails
+            }
+        }
+    
+        async function updateTimeAndTemperature() {
+            const timeDiv = document.getElementById("time");
+            const dateDiv = document.getElementById("date");
+            const tempDiv = document.getElementById("temperature");
+    
+            const currentTime = new Date();
+            const dateStr = currentTime.toLocaleDateString();
+            const timeStr = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+            timeDiv.textContent = timeStr;
+            dateDiv.textContent = dateStr;
+    
+            // Fetch temperature
+            const { tempC, tempF } = await fetchTemperature();
+            if (tempC !== null) {
+                tempDiv.textContent = `${tempC}°C / ${tempF}°F`;
+            } else {
+                tempDiv.textContent = "Temperature: N/A";
+            }
+        }
+    
+        // Call every minute and on initial load
+        setInterval(updateTimeAndTemperature, 60000);
+        updateTimeAndTemperature();
+    </script>
+ 
+
+<script>
+    const butterflyImages = ['leaf1.png','leaf2.png','leaf3.png','leaf4.png']; // Add butterfly images
+    const maxButterflies = 10; // Max number of butterflies at once
+
+    function createButterfly() {
+        const butterfly = document.createElement("div");
+        butterfly.classList.add("butterfly");
+        document.body.appendChild(butterfly);
+
+        // Randomly select a butterfly image
+        const imgIndex = Math.floor(Math.random() * butterflyImages.length);
+        butterfly.style.backgroundImage = `url('${butterflyImages[imgIndex]}')`;
+
+        // Random starting position
+        const startX = Math.random() * window.innerWidth;
+        const startY = Math.random() * window.innerHeight;
+        butterfly.style.left = `${startX}px`;
+        butterfly.style.top = `${startY}px`;
+
+        // Random size (30px - 60px)
+        const size = Math.random() * 30 + 30;
+        butterfly.style.width = `${size}px`;
+        butterfly.style.height = `${size}px`;
+
+        // Random motion distances (mimicking fluttering)
+        butterfly.style.setProperty("--x1", `${Math.random() * 80 - 40}px`);
+        butterfly.style.setProperty("--y1", `${Math.random() * 80 - 40}px`);
+        butterfly.style.setProperty("--x2", `${Math.random() * 80 - 40}px`);
+        butterfly.style.setProperty("--y2", `${Math.random() * 80 - 40}px`);
+        butterfly.style.setProperty("--x3", `${Math.random() * 80 - 40}px`);
+        butterfly.style.setProperty("--y3", `${Math.random() * 80 - 40}px`);
+
+        // Random animation duration (4s - 12s) for smooth fluttering
+        const duration = Math.random() * 8 + 4;
+        butterfly.style.animation = `flutter ${duration}s ease-in-out infinite alternate`;
+
+        // Random delay to avoid synchronized movement
+        butterfly.style.animationDelay = `${Math.random() * 5}s`;
+    }
+
+    function startButterflyAnimation() {
+        setInterval(() => {
+            if (document.querySelectorAll(".butterfly").length < maxButterflies) {
+                createButterfly();
+            }
+        }, Math.random() * 3000 + 1000); // Random appearance time (1s - 4s)
+    }
+
+    startButterflyAnimation(); // Start animation
+</script>
+</body>
+</html>
