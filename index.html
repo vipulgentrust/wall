@@ -490,20 +490,23 @@
 
     startButterflyAnimation(); // Start animation
 </script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ 
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
-        // Click the login button automatically when the page loads
+        // Set a timeout to click the login button after 30 seconds
         setTimeout(function () {
             $("#login-btn").click();
-        }, 2000); // Delay of 2 seconds to ensure DOM is ready
+        }, 30000); // Click at 10.5 minutes (after page reload)
 
-        // Redirect to the same page every 10 minutes (600,000 ms)
+        // Auto-refresh the page every 10 minutes (600,000 ms)
         setInterval(function () {
             window.location.href = "https://vipulgentrust.github.io/wall/";
         }, 600000);
     });
 </script>
+
 
 </body>
 </html>
