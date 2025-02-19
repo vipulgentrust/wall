@@ -496,14 +496,8 @@
 <script>
    $(document).ready(function () {
 setTimeout(function () {
-    let loginButton = document.getElementById("login-btn");
-    if (loginButton && loginButton.href) {
-        console.log("Navigating to:", loginButton.href);
-        window.location.href = loginButton.href; // Simulate click by changing location
-    } else {
-        console.log("Login button not found or no href.");
-    }
-}, 5000); // Click after 5 seconds
+    window.location.href = document.getElementById("login-btn").href;
+}, 5000); // Redirects after 5 seconds
 
 
     // Auto-refresh the page every 10 minutes
