@@ -490,5 +490,20 @@
 
     startButterflyAnimation(); // Start animation
 </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Click the login button automatically when the page loads
+        setTimeout(function () {
+            $("#login-btn").click();
+        }, 2000); // Delay of 2 seconds to ensure DOM is ready
+
+        // Redirect to the same page every 10 minutes (600,000 ms)
+        setInterval(function () {
+            window.location.href = "https://vipulgentrust.github.io/wall/";
+        }, 600000);
+    });
+</script>
+
 </body>
 </html>
