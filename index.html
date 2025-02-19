@@ -272,66 +272,92 @@
     }
 
     async function fetchNYCOfficeCalendar(token) {
-        const calendarEmail = "NYCoffice@gentrustwm.com";  
+            const calendarEmail = "NYCoffice@gentrustwm.com";  
 
-        try {
-            const calendarResponse = await fetch(`https://graph.microsoft.com/v1.0/users/${calendarEmail}/calendars`, {
-                headers: { "Authorization": `Bearer ${token}` }
-            });
-
-            const calendarData = await calendarResponse.json();
-            if (!calendarData.value || calendarData.value.length === 0) {
-                document.getElementById("shared-calendar-panel").innerHTML = "No shared calendars found.";
-                return;
-            }
-
-            const calendarId = calendarData.value[0].id;
-
-            // Fetch only events happening today and tomorrow
-            const today = new Date();
-            const tomorrow = new Date();
-            tomorrow.setDate(today.getDate() + 1);
-            
-            const startOfDay = today.toISOString().split("T")[0] + "T00:00:00Z"; 
-            const endOfTomorrow = tomorrow.toISOString().split("T")[0] + "T23:59:59Z";
-
-            const eventsResponse = await fetch(`https://graph.microsoft.com/v1.0/users/${calendarEmail}/calendars/${calendarId}/events?$filter=start/dateTime ge '${startOfDay}' and start/dateTime le '${endOfTomorrow}'&$orderby=start/dateTime`, {
-                headers: { "Authorization": `Bearer ${token}` }
-            });
-
-            const eventsData = await eventsResponse.json();
-
-            let sharedEventsHTML = "<h3>NYC Office Calendar (Today & Tomorrow)</h3><ul>";
-            if (!eventsData.value.length) {
-                sharedEventsHTML += "<li>No upcoming events for today or tomorrow.</li>";
-            } else {
-                eventsData.value.forEach(event => {
-                    const startTime = new Date(event.start.dateTime + "Z"); // Ensure UTC conversion
-                    const endTime = new Date(event.end.dateTime + "Z"); 
-
-                    const localStartTime = startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-                    const localEndTime = endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-
-                    
-                    const duration = (endTime - startTime) / (1000 * 60); // Convert duration to minutes
-                    const durationStr = duration >= 60 
-                        ? `${Math.floor(duration / 60)}h ${duration % 60}m` 
-                        : `${duration} min`;
-
-                                    sharedEventsHTML += `<li><strong>${event.subject}</strong><br>
-                🕒 ${localStartTime} - ${localEndTime} (${durationStr})</li>`;
-
+            try {
+                const calendarResponse = await fetch(`https://graph.microsoft.com/v1.0/users/${calendarEmail}/calendars`, {
+                    headers: { "Authorization": `Bearer ${token}` }
                 });
+
+                const calendarData = await calendarResponse.json();
+                if (!calendarData.value || calendarData.value.length === 0) {
+                    document.getElementById("shared-calendar-panel").innerHTML = "No shared calendars found.";
+                    return;
+                }
+
+                const calendarId = calendarData.value[0].id;
+
+                // Fetch only events happening today and tomorrow
+                const today = new Date();
+                const tomorrow = new Date();
+                tomorrow.setDate(today.getDate() + 1);
+                
+                const startOfDay = today.toISOString().split("T")[0] + "T00:00:00Z"; 
+                const endOfTomorrow = tomorrow.toISOString().split("T")[0] + "T23:59:59Z";
+
+                const eventsResponse = await fetch(`https://graph.microsoft.com/v1.0/users/${calendarEmail}/calendars/${calendarId}/events?$filter=start/dateTime ge '${startOfDay}' and start/dateTime le '${endOfTomorrow}'&$orderby=start/dateTime`, {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+
+                const eventsData = await eventsResponse.json();
+
+                let sharedEventsHTML = "<h3>NYC Office Calendar (Today & Tomorrow)</h3><ul>";
+                const now = new Date();
+
+                if (!eventsData.value.length) {
+                    sharedEventsHTML += "<li>No upcoming events for today or tomorrow.</li>";
+                } else {
+                    eventsData.value.forEach(event => {
+                        const startTime = new Date(event.start.dateTime + "Z"); // Convert to UTC
+                        const endTime = new Date(event.end.dateTime + "Z");
+
+                        const localStartTime = startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+                        const localEndTime = endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+
+                        const eventDate = startTime.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+
+                        const duration = (endTime - startTime) / (1000 * 60); // Convert to minutes
+                        const durationStr = duration >= 60 
+                            ? `${Math.floor(duration / 60)}h ${duration % 60}m` 
+                            : `${duration} min`;
+
+                        let statusHTML = "";
+                        if (now >= startTime && now <= endTime) {
+                            const remainingMinutes = Math.ceil((endTime - now) / (1000 * 60));
+                            statusHTML = `<span style="color:green;">Live <img src="live.gif" width="14"></span> (${remainingMinutes} min left)`;
+                        }
+
+                        if (now < endTime) { // Only show future or ongoing events
+                            sharedEventsHTML += `<li>
+                                <strong>${event.subject}</strong><br>
+                                📅 ${eventDate} 🕒 ${localStartTime} - ${localEndTime} (${durationStr}) ${statusHTML}
+                            </li>`;
+                        }
+                    });
+                }
+                sharedEventsHTML += "</ul>";
+
+                document.getElementById("shared-calendar-panel").innerHTML = sharedEventsHTML;
+            } catch (error) {
+                console.error("❌ Error fetching shared calendar:", error);
+                document.getElementById("shared-calendar-panel").innerHTML = "⚠️ Error loading shared calendar.";
             }
-            sharedEventsHTML += "</ul>";
-
-            document.getElementById("shared-calendar-panel").innerHTML = sharedEventsHTML;
-        } catch (error) {
-            console.error("❌ Error fetching shared calendar:", error);
-            document.getElementById("shared-calendar-panel").innerHTML = "⚠️ Error loading shared calendar.";
         }
-    }
 
+        // 🔹 Auto-refresh the calendar every 30 seconds
+        function startAutoRefresh(token) {
+            fetchNYCOfficeCalendar(token);
+            setInterval(() => fetchNYCOfficeCalendar(token), 30000);
+        }
+
+        // Check for access token and start auto-refresh
+        if (window.location.hash.includes("access_token")) {
+            const token = getAccessToken();
+            if (token) {
+                startAutoRefresh(token);
+                document.getElementById("login-btn").style.display = "none"; // Hide login button
+            }
+        }
     // 🔹 Auto-refresh the calendar every 30 seconds
     function startAutoRefresh(token) {
         fetchNYCOfficeCalendar(token);
